@@ -18,6 +18,8 @@ class _FlyerPageState extends State<FlyerPage> {
   final TextEditingController _rocketLengthController = TextEditingController();
   final TextEditingController _rocketDiameterController = TextEditingController();
   final TextEditingController _rocketWeightController = TextEditingController();
+  final TextEditingController _rocketMotorController = TextEditingController();
+  final TextEditingController _rocketDelayController = TextEditingController();
   String _qrData = '';
   String _certificationLevel = '0';
 
@@ -37,6 +39,7 @@ class _FlyerPageState extends State<FlyerPage> {
     final length = prefs.getString('rocket_length') ?? '';
     final diameter = prefs.getString('rocket_diameter') ?? '';
     final weight = prefs.getString('rocket_weight') ?? '';
+    
     setState(() {
       _controller.text = name;
       _narController.text = nar;
@@ -46,6 +49,7 @@ class _FlyerPageState extends State<FlyerPage> {
       _rocketLengthController.text = length;
       _rocketDiameterController.text = diameter;
       _rocketWeightController.text = weight;
+      // motor is not persisted
     });
   }
 
@@ -58,6 +62,8 @@ class _FlyerPageState extends State<FlyerPage> {
     _rocketLengthController.dispose();
     _rocketDiameterController.dispose();
     _rocketWeightController.dispose();
+    _rocketMotorController.dispose();
+    _rocketDelayController.dispose();
     super.dispose();
   }
 
@@ -175,10 +181,33 @@ class _FlyerPageState extends State<FlyerPage> {
                       SizedBox(
                         width: 300,
                         child: TextField(
+                          controller: _rocketMotorController,
+                          decoration: const InputDecoration(
+                            labelText: 'Motor',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketDelayController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Delay (seconds)',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
                           controller: _rocketLengthController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           decoration: const InputDecoration(
-                            labelText: 'Length',
+                            labelText: 'Length (inches)',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -190,7 +219,7 @@ class _FlyerPageState extends State<FlyerPage> {
                           controller: _rocketDiameterController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           decoration: const InputDecoration(
-                            labelText: 'Diameter',
+                            labelText: 'Diameter (inches)',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -202,7 +231,7 @@ class _FlyerPageState extends State<FlyerPage> {
                           controller: _rocketWeightController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           decoration: const InputDecoration(
-                            labelText: 'Weight',
+                            labelText: 'Weight (ounces)',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -218,9 +247,12 @@ class _FlyerPageState extends State<FlyerPage> {
                   final nar = _narController.text.trim();
                   final rocket = _rocketController.text.trim();
                   final manufacturer = _rocketManufacturerController.text.trim();
+                  final motor = _rocketMotorController.text.trim();
+                  final delayText = _rocketDelayController.text.trim();
                   final lengthText = _rocketLengthController.text.trim();
                   final diameterText = _rocketDiameterController.text.trim();
                   final weightText = _rocketWeightController.text.trim();
+                  final delay = int.tryParse(delayText);
                   final length = double.tryParse(lengthText);
                   final diameter = double.tryParse(diameterText);
                   final weight = double.tryParse(weightText);
@@ -230,6 +262,8 @@ class _FlyerPageState extends State<FlyerPage> {
                     'certification_level': _certificationLevel,
                     'rocket_name': rocket,
                     'rocket_manufacturer': manufacturer,
+                    'rocket_motor': motor,
+                    'rocket_delay': delay,
                     'rocket_length': length,
                     'rocket_diameter': diameter,
                     'rocket_weight': weight,
