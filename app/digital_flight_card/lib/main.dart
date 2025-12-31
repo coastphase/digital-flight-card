@@ -29,6 +29,10 @@ class HomeSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(320, 96),
+                textStyle: const TextStyle(fontSize: 24),
+              ),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const FlyerPage()));
               },
@@ -36,6 +40,10 @@ class HomeSelector extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(320, 96),
+                textStyle: const TextStyle(fontSize: 24),
+              ),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const RSOPage()));
               },
