@@ -15,6 +15,9 @@ class _FlyerPageState extends State<FlyerPage> {
   final TextEditingController _narController = TextEditingController();
   final TextEditingController _rocketController = TextEditingController();
   final TextEditingController _rocketManufacturerController = TextEditingController();
+  final TextEditingController _rocketLengthController = TextEditingController();
+  final TextEditingController _rocketDiameterController = TextEditingController();
+  final TextEditingController _rocketWeightController = TextEditingController();
   String _qrData = '';
   String _certificationLevel = '0';
 
@@ -31,12 +34,18 @@ class _FlyerPageState extends State<FlyerPage> {
     final cert = prefs.getString('cert_level') ?? '0';
     final rocket = prefs.getString('rocket_name') ?? '';
     final manufacturer = prefs.getString('rocket_manufacturer') ?? '';
+    final length = prefs.getString('rocket_length') ?? '';
+    final diameter = prefs.getString('rocket_diameter') ?? '';
+    final weight = prefs.getString('rocket_weight') ?? '';
     setState(() {
       _controller.text = name;
       _narController.text = nar;
       _certificationLevel = cert;
       _rocketController.text = rocket;
       _rocketManufacturerController.text = manufacturer;
+      _rocketLengthController.text = length;
+      _rocketDiameterController.text = diameter;
+      _rocketWeightController.text = weight;
     });
   }
 
@@ -46,6 +55,9 @@ class _FlyerPageState extends State<FlyerPage> {
     _narController.dispose();
     _rocketController.dispose();
     _rocketManufacturerController.dispose();
+    _rocketLengthController.dispose();
+    _rocketDiameterController.dispose();
+    _rocketWeightController.dispose();
     super.dispose();
   }
 
@@ -159,6 +171,42 @@ class _FlyerPageState extends State<FlyerPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketLengthController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(
+                            labelText: 'Length',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketDiameterController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(
+                            labelText: 'Diameter',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketWeightController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(
+                            labelText: 'Weight',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -170,12 +218,21 @@ class _FlyerPageState extends State<FlyerPage> {
                   final nar = _narController.text.trim();
                   final rocket = _rocketController.text.trim();
                   final manufacturer = _rocketManufacturerController.text.trim();
+                  final lengthText = _rocketLengthController.text.trim();
+                  final diameterText = _rocketDiameterController.text.trim();
+                  final weightText = _rocketWeightController.text.trim();
+                  final length = double.tryParse(lengthText);
+                  final diameter = double.tryParse(diameterText);
+                  final weight = double.tryParse(weightText);
                   final payload = jsonEncode({
                     'name': name,
                     'nar_tra_number': nar,
                     'certification_level': _certificationLevel,
                     'rocket_name': rocket,
                     'rocket_manufacturer': manufacturer,
+                    'rocket_length': length,
+                    'rocket_diameter': diameter,
+                    'rocket_weight': weight,
                   });
                   setState(() {
                     _qrData = payload;
@@ -195,8 +252,6 @@ class _FlyerPageState extends State<FlyerPage> {
                   await prefs.setString('name', name);
                   await prefs.setString('nar', nar);
                   await prefs.setString('cert_level', _certificationLevel);
-                  await prefs.setString('rocket_name', rocket);
-                  await prefs.setString('rocket_manufacturer', manufacturer);
                 },
                 child: const Text('Submit'),
               ),
