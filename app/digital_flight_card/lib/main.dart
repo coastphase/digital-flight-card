@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 void main() {
@@ -12,28 +13,99 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const HomePage(),
+      home: const HomeSelector(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeSelector extends StatelessWidget {
+  const HomeSelector({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Digital Flight Card')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const FlyerPage()));
+              },
+              child: const Text('Flyer'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const RSOPage()));
+              },
+              child: const Text('RSO'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+class RSOPage extends StatelessWidget {
+  const RSOPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('RSO Page')),
+      body: const Center(
+        child: Text('RSO Page — placeholder'),
+      ),
+    );
+  }
+}
+
+class FlyerPage extends StatefulWidget {
+  const FlyerPage({super.key});
+
+  @override
+  State<FlyerPage> createState() => _FlyerPageState();
+}
+
+class _FlyerPageState extends State<FlyerPage> {
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _narController = TextEditingController();
+  final TextEditingController _rocketController = TextEditingController();
+  final TextEditingController _rocketManufacturerController = TextEditingController();
   String _qrData = '';
   String _certificationLevel = '0';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedFields();
+  }
+
+  Future<void> _loadSavedFields() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('name') ?? '';
+    final nar = prefs.getString('nar') ?? '';
+    final cert = prefs.getString('cert_level') ?? '0';
+    final rocket = prefs.getString('rocket_name') ?? '';
+    final manufacturer = prefs.getString('rocket_manufacturer') ?? '';
+    setState(() {
+      _controller.text = name;
+      _narController.text = nar;
+      _certificationLevel = cert;
+      _rocketController.text = rocket;
+      _rocketManufacturerController.text = manufacturer;
+    });
+  }
 
   @override
   void dispose() {
     _controller.dispose();
     _narController.dispose();
+    _rocketController.dispose();
+    _rocketManufacturerController.dispose();
     super.dispose();
   }
 
@@ -91,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         width: 300,
                         child: DropdownButtonFormField<String>(
-                          value: _certificationLevel,
+                          initialValue: _certificationLevel,
                           decoration: const InputDecoration(
                             labelText: 'Certification Level',
                             border: OutlineInputBorder(),
@@ -114,22 +186,70 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Rocket Info', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketController,
+                          decoration: const InputDecoration(
+                            labelText: 'Rocket Name',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _rocketManufacturerController,
+                          decoration: const InputDecoration(
+                            labelText: 'Manufacturer',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final name = _controller.text.trim();
                   final nar = _narController.text.trim();
+                  final rocket = _rocketController.text.trim();
+                  final manufacturer = _rocketManufacturerController.text.trim();
                   final payload = jsonEncode({
                     'name': name,
                     'nar_tra_number': nar,
                     'certification_level': _certificationLevel,
+                    'rocket_name': rocket,
+                    'rocket_manufacturer': manufacturer,
                   });
                   setState(() {
                     _qrData = payload;
                   });
-                  final snackText = (name.isEmpty && nar.isEmpty)
+
+                  // persist fields for next app launch
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('name', name);
+                  await prefs.setString('nar', nar);
+                  await prefs.setString('cert_level', _certificationLevel);
+
+                  final snackText = (name.isEmpty && nar.isEmpty && rocket.isEmpty && manufacturer.isEmpty)
                       ? 'Submitted'
-                      : 'Submitted: ${name.isEmpty ? '' : name}${nar.isEmpty ? '' : ' — $nar'}';
+                      : 'Submitted: ${name.isEmpty ? '' : name}${nar.isEmpty ? '' : ' — $nar'}${rocket.isEmpty ? '' : ' — $rocket'}${manufacturer.isEmpty ? '' : ' — $manufacturer'}';
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(snackText)),
                   );
