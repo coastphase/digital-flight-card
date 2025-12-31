@@ -253,7 +253,7 @@
           <!-- Dual Deploy -->
           <fieldset class="checkbox-group">
             <legend>Dual Deploy</legend>
-            <label><input type="radio" name="dualDeploy" value="none">No</label>
+            <label><input type="radio" name="dualDeploy" value="none">None</label>
             <label><input type="radio" name="dualDeploy" value="charge">Ejection Charge</label>
             <label><input type="radio" name="dualDeploy" value="release">Parachute Release</label>
             <div>
@@ -297,15 +297,10 @@
         modelName: document.getElementById("modelName").value,
         narTra: document.getElementById("narTra").value,
         manufacturer: document.getElementById("manufacturer").value,
-        comments: document.getElementById("comments").value,
         level: Number(document.getElementById("level").value),
         length: Number(document.getElementById("length").value),
         diameter: Number(document.getElementById("diameter").value),
         weight: Number(document.getElementById("weight").value),
-        firstFlight: document.getElementById("firstFlight").checked,
-        certification: document.getElementById("certification").checked,
-        headsUp: document.getElementById("headsUp").checked,
-        other: document.getElementById("other").checked,
         launchGuide: document.querySelector('input[name="launchGuide"]:checked')?.value,
         ejection: document.querySelector('input[name="ejection"]:checked')?.value,
         recovery: document.querySelector('input[name="recovery"]:checked')?.value,
@@ -335,6 +330,27 @@
 
       if (data.dualDeploy == "charge" || data.dualDeploy == "release") {
         data.mainAlt = document.getElementById("mainalt").value
+      }
+
+      if(document.getElementById("firstFlight").checked) {
+        data.firstFlight = true
+      }
+
+      if(document.getElementById("certification").checked) {
+        data.certification = true
+      }
+
+      if(document.getElementById("headsUp").checked) {
+        data.headsUp = true
+      }
+      
+      if(document.getElementById("other").checked) {
+        data.other = true
+      }
+
+      if(document.getElementById("comments").value != "")
+      {
+        data.comments = document.getElementById("comments").value
       }
 
       const jsonString = JSON.stringify(data, null, 2);
