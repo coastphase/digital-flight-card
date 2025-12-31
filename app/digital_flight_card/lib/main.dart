@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'rso_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -33,14 +34,14 @@ class HomeSelector extends StatelessWidget {
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const FlyerPage()));
               },
-              child: const Text('Flyer'),
+              child: const Text('I\'m a Flyer'),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const RSOPage()));
               },
-              child: const Text('RSO'),
+              child: const Text('I\'m an RSO'),
             ),
           ],
         ),
@@ -49,19 +50,7 @@ class HomeSelector extends StatelessWidget {
   }
 }
 
-class RSOPage extends StatelessWidget {
-  const RSOPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('RSO Page')),
-      body: const Center(
-        child: Text('RSO Page — placeholder'),
-      ),
-    );
-  }
-}
+// RSOPage moved to lib/rso_page.dart
 
 class FlyerPage extends StatefulWidget {
   const FlyerPage({super.key});
@@ -241,18 +230,20 @@ class _FlyerPageState extends State<FlyerPage> {
                     _qrData = payload;
                   });
 
+                  final snackText = (name.isEmpty && nar.isEmpty && rocket.isEmpty && manufacturer.isEmpty)
+                      ? 'Submitted'
+                      : 'Submitted: ${name.isEmpty ? '' : name}${nar.isEmpty ? '' : ' — $nar'}${rocket.isEmpty ? '' : ' — $rocket'}${manufacturer.isEmpty ? '' : ' — $manufacturer'}';
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(snackText)),
+                    );
+                  }
+
                   // persist fields for next app launch
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setString('name', name);
                   await prefs.setString('nar', nar);
                   await prefs.setString('cert_level', _certificationLevel);
-
-                  final snackText = (name.isEmpty && nar.isEmpty && rocket.isEmpty && manufacturer.isEmpty)
-                      ? 'Submitted'
-                      : 'Submitted: ${name.isEmpty ? '' : name}${nar.isEmpty ? '' : ' — $nar'}${rocket.isEmpty ? '' : ' — $rocket'}${manufacturer.isEmpty ? '' : ' — $manufacturer'}';
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(snackText)),
-                  );
                 },
                 child: const Text('Submit'),
               ),
