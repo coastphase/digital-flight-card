@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Digital Flight Card</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 10px;
+    }
+
+    h1,
+    h3 {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      font-size: 16px;
+      /* Prevents mobile zoom */
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .checkbox-group {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: normal;
+    }
+
+    .checkbox-group input[type="checkbox"], input[type="radio"]{
+      margin-right: 8px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .input-section {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+
+
+    .input-section legend {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .input-section label {
+      font-size: 14px;
+      font-weight: normal;
+    }
+
+    .stage-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stage-section label {
+      text-align: right;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:active {
+      background-color: #0056b3;
+    }
+
+    #jsonOutput {
+      margin-top: 16px;
+      background: #f0f0f0;
+      padding: 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    #qrcode {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <h1>Digital Flight Card</h1>
+    <form id="dataForm">
+      <div id="qrcode"></div>
+      <!-- Flyer Info -->
+      <fieldset class="input-section">
+        <legend>Flyer</legend>
+        <label>Name</label>
+        <input type="text" id="name">
+
+        <label>NAR/TRA#</label>
+        <input type="text" id="narTra">
+
+        <label>Certification Level</label>
+        <select id="level" list="cert-levels">
+          <option value="0">None</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </fieldset>
+      <!-- Rocket Info -->
+      <fieldset class="input-section">
+        <legend>Rocket Info</legend>
+        <label>Model Name</label>
+        <input type="text" id="modelName">
+
+        <label>Manufacturer</label>
+        <input type="text" id="manufacturer">
+
+        <label>Length (inches)</label>
+        <input type="number" id="length" step="any">
+
+        <label>Diameter (inches)</label>
+        <input type="number" id="diameter" step="any">
+
+        <label>Weight (ounces)</label>
+        <input type="number" id="weight" step="any">
+        <!-- Launch Guide -->
+        <fieldset class="checkbox-group">
+          <legend>Launch Guide</legend>
+          <label><input type="radio" name="launchGuide" value="1/8">1/8" Rod</label>
+          <label><input type="radio" name="launchGuide" value="3/16">3/16" Rod</label>
+          <label><input type="radio" name="launchGuide" value="1/4">1/4" Rod</label>
+          <label><input type="radio" name="launchGuide" value="1010">1010 Rail</label>
+          <label><input type="radio" name="launchGuide" value="1515">1515 Rail</label>
+        </fieldset>
+
+        <!-- Motors -->
+        <fieldset class="input-section">
+          <legend>Motors</legend>
+          <!-- Stage 1 -->
+          <fieldset class="stage-section">
+            <legend>Stage 1</legend>
+            <label>Qty</label>
+            <input type="number" id="stage1Qty" max="10">
+
+            <label>Size</label>
+            <input type="text" id="stage1Size">
+
+            <label>Delay</label>
+            <input type="number" id="stage1Delay">
+          </fieldset>
+          <!-- Stage 2 -->
+          <fieldset class="stage-section">
+            <legend>Stage 2</legend>
+            <label>Qty</label>
+            <input type="number" id="stage2Qty" max="10">
+
+            <label>Size</label>
+            <input type="text" id="stage2Size">
+
+            <label>Delay</label>
+            <input type="number" id="stage2Delay">
+          </fieldset>
+          <!-- Stage 3 -->
+          <fieldset class="stage-section">
+            <legend>Stage 3</legend>
+            <label>Qty</label>
+            <input type="number" id="stage3Qty" max="10">
+
+            <label>Size</label>
+            <input type="text" id="stage3Size">
+
+            <label>Delay</label>
+            <input type="number" id="stage3Delay">
+          </fieldset>
+        </fieldset>
+
+        <!-- Recovery -->
+        <fieldset class="input-section">
+          <legend>Recovery</legend>
+
+          <!-- Apogee Ejection -->
+          <fieldset class="checkbox-group">
+            <legend>Apogee Ejection</legend>
+            <label><input type="radio" name="ejection" value="motor">Motor Eject</label>
+            <label><input type="radio" name="ejection" value="alt">Electronic</label>
+          </fieldset>
+
+          <!-- Recovery Method -->
+          <fieldset class="checkbox-group">
+            <legend>Recovery Method</legend>
+            <label><input type="radio" name="recovery" value="parachute">Parachute</label>
+            <label><input type="radio" name="recovery" value="streamer">Streamer</label>
+            <label><input type="radio" name="recovery" value="tumble">Tumble</label>
+            <label><input type="radio" name="recovery" value="streamer">Helicopter</label>
+            <label><input type="radio" name="recovery" value="streamer">Glider</label>
+          </fieldset>
+
+          <!-- Dual Deploy -->
+          <fieldset class="checkbox-group">
+            <legend>Dual Deploy</legend>
+            <label><input type="radio" name="dualDeploy" value="none">No</label>
+            <label><input type="radio" name="dualDeploy" value="charge">Ejection Charge</label>
+            <label><input type="radio" name="dualDeploy" value="release">Parachute Release</label>
+            <div>
+              <label >Main Alt</label>
+              <input type="number" id="mainalt" step="100">
+            </div>
+          </fieldset>
+        </fieldset>
+      </fieldset>
+
+      <!-- Flight Info -->
+      <fieldset class="input-section">
+        <legend>Flight Info</legend>
+        <label><input type="checkbox" id="firstFlight"> First Flight</label>
+        <label><input type="checkbox" id="certification"> Certification</label>
+        <label><input type="checkbox" id="headsUp"> Heads Up</label>
+        <label><input type="checkbox" id="other"> Other</label>
+        <label style="display: block">Comments</label>
+        <textarea id="comments" rows="3"></textarea>
+      </fieldset>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <h3>Generated JSON</h3>
+    <div id="jsonOutput"></div>
+
+
+  </div>
+
+  <script>
+    const form = document.getElementById("dataForm");
+    const jsonOutput = document.getElementById("jsonOutput");
+    const qrContainer = document.getElementById("qrcode");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        name: document.getElementById("name").value,
+        modelName: document.getElementById("modelName").value,
+        narTra: document.getElementById("narTra").value,
+        manufacturer: document.getElementById("manufacturer").value,
+        comments: document.getElementById("comments").value,
+        level: Number(document.getElementById("level").value),
+        length: Number(document.getElementById("length").value),
+        diameter: Number(document.getElementById("diameter").value),
+        weight: Number(document.getElementById("weight").value),
+        firstFlight: document.getElementById("firstFlight").checked,
+        certification: document.getElementById("certification").checked,
+        headsUp: document.getElementById("headsUp").checked,
+        other: document.getElementById("other").checked,
+        launchGuide: document.querySelector('input[name="launchGuide"]:checked')?.value,
+        ejection: document.querySelector('input[name="ejection"]:checked')?.value,
+        recovery: document.querySelector('input[name="recovery"]:checked')?.value,
+        dualDeploy: document.querySelector('input[name="dualDeploy"]:checked')?.value,
+        stage1: {
+          qty: Number(document.getElementById("stage1Qty").value),
+          size: document.getElementById("stage1Size").value,
+          delay: document.getElementById("stage1Delay").value
+        }
+      };
+
+      if (Number(document.getElementById("stage2Qty").value) > 0) {
+        data.stage2 = {
+          qty: Number(document.getElementById("stage2Qty").value),
+          size: document.getElementById("stage2Size").value,
+          delay: document.getElementById("stage2Delay").value
+        }
+      }
+
+      if (Number(document.getElementById("stage3Qty").value) > 0) {
+        data.stage3 = {
+          qty: Number(document.getElementById("stage3Qty").value),
+          size: document.getElementById("stage3Size").value,
+          delay: document.getElementById("stage3Delay").value
+        }
+      }
+
+      if (data.dualDeploy == "charge" || data.dualDeploy == "release") {
+        data.mainAlt = document.getElementById("mainalt").value
+      }
+
+      const jsonString = JSON.stringify(data, null, 2);
+      jsonOutput.textContent = jsonString;
+
+      qrContainer.innerHTML = "";
+      new QRCode(qrContainer, {
+        text: jsonString,
+        width: 512,
+        height: 512,
+        correctLevel : QRCode.CorrectLevel.L
+      });
+
+      localStorage.setItem("name", data.name)
+      localStorage.setItem("narTra", data.narTra)
+      localStorage.setItem("level", data.level)
+
+      window.scrollTo(0, 0);
+    });
+
+    window.addEventListener('load', function(e) {
+      document.getElementById("name").value = localStorage["name"] || ""
+      document.getElementById("narTra").value = localStorage["narTra"] || ""
+      document.getElementById("level").value = localStorage["level"] || ""
+    })
+  </script>
+
+</body>
+
+</html>
