@@ -15,6 +15,7 @@
       background: #f2f2f2;
       margin: 0;
       padding: 10px;
+      font-size: 28px;
     }
 
     .container {
@@ -35,7 +36,7 @@
       display: block;
       margin-top: 14px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 28px;
     }
 
     input[type="text"],
@@ -45,7 +46,7 @@
       width: 100%;
       padding: 12px;
       margin-top: 6px;
-      font-size: 16px;
+      font-size: 28px;
       /* Prevents mobile zoom */
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -65,14 +66,14 @@
     .checkbox-group label {
       display: flex;
       align-items: center;
-      font-size: 14px;
+      font-size: 28px;
       font-weight: normal;
     }
 
     .checkbox-group input[type="checkbox"], input[type="radio"]{
       margin-right: 8px;
-      width: 20px;
-      height: 20px;
+      width: 25px;
+      height: 25px;
     }
 
     .input-section {
@@ -81,15 +82,19 @@
       gap: 10px;
     }
 
-
+    .input-section input[type="checkbox"] {
+      margin-right: 8px;
+      width: 25px;
+      height: 25px;
+    }
 
     .input-section legend {
-      font-size: 16px;
+      font-size: 28px;
       font-weight: bold;
     }
 
     .input-section label {
-      font-size: 14px;
+      font-size: 28px;
       font-weight: normal;
     }
 
@@ -107,7 +112,7 @@
       width: 100%;
       margin-top: 24px;
       padding: 14px;
-      font-size: 18px;
+      font-size: 28px;
       background-color: #007bff;
       color: white;
       border: none;
@@ -123,7 +128,7 @@
       margin-top: 16px;
       background: #f0f0f0;
       padding: 12px;
-      font-size: 14px;
+      font-size: 28px;
       border-radius: 6px;
       white-space: pre-wrap;
       word-break: break-word;
@@ -272,7 +277,7 @@
         <label><input type="checkbox" id="headsUp"> Heads Up</label>
         <label><input type="checkbox" id="other"> Other</label>
         <label style="display: block">Comments</label>
-        <textarea id="comments" rows="3"></textarea>
+        <textarea id="comments" rows="2"></textarea>
       </fieldset>
 
       <button type="submit">Submit</button>
